@@ -1,0 +1,286 @@
+{
+  "ver": "2.3.14",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "d6ff8e9a-b41c-4f35-8af6-951e7dcdff4a",
+  "files": [],
+  "subMetas": {
+    "01a55": {
+      "importer": "gltf-mesh",
+      "uuid": "d6ff8e9a-b41c-4f35-8af6-951e7dcdff4a@01a55",
+      "displayName": "",
+      "id": "01a55",
+      "name": "polySurface1.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 800
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "db573": {
+      "importer": "gltf-mesh",
+      "uuid": "d6ff8e9a-b41c-4f35-8af6-951e7dcdff4a@db573",
+      "displayName": "",
+      "id": "db573",
+      "name": "polySurface2.mesh",
+      "userData": {
+        "gltfIndex": 1,
+        "triangleCount": 2240
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "43c71": {
+      "importer": "gltf-embeded-image",
+      "uuid": "d6ff8e9a-b41c-4f35-8af6-951e7dcdff4a@43c71",
+      "displayName": "",
+      "id": "43c71",
+      "name": "file1.image",
+      "userData": {
+        "gltfIndex": 0,
+        "fixAlphaTransparencyArtifacts": true,
+        "hasAlpha": true,
+        "type": "texture",
+        "compressSettings": {
+          "useCompressTexture": true
+        }
+      },
+      "ver": "1.0.3",
+      "imported": true,
+      "files": [
+        ".json",
+        ".png"
+      ],
+      "subMetas": {}
+    },
+    "d20e9": {
+      "importer": "texture",
+      "uuid": "d6ff8e9a-b41c-4f35-8af6-951e7dcdff4a@d20e9",
+      "displayName": "",
+      "id": "d20e9",
+      "name": "file1.texture",
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "d6ff8e9a-b41c-4f35-8af6-951e7dcdff4a@43c71"
+      },
+      "ver": "1.0.22",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "0b7b5": {
+      "importer": "gltf-material",
+      "uuid": "d6ff8e9a-b41c-4f35-8af6-951e7dcdff4a@0b7b5",
+      "displayName": "",
+      "id": "0b7b5",
+      "name": "phong1.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "b8673": {
+      "importer": "gltf-material",
+      "uuid": "d6ff8e9a-b41c-4f35-8af6-951e7dcdff4a@b8673",
+      "displayName": "",
+      "id": "b8673",
+      "name": "phong2.material",
+      "userData": {
+        "gltfIndex": 1
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "77db0": {
+      "importer": "gltf-scene",
+      "uuid": "d6ff8e9a-b41c-4f35-8af6-951e7dcdff4a@77db0",
+      "displayName": "",
+      "id": "77db0",
+      "name": "cricle (1).prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [
+      {
+        "name": "file1",
+        "uri": "d6ff8e9a-b41c-4f35-8af6-951e7dcdff4a@43c71"
+      }
+    ],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [
+        "d6ff8e9a-b41c-4f35-8af6-951e7dcdff4a@01a55",
+        "d6ff8e9a-b41c-4f35-8af6-951e7dcdff4a@db573"
+      ],
+      "skeletons": [],
+      "textures": [
+        "d6ff8e9a-b41c-4f35-8af6-951e7dcdff4a@d20e9"
+      ],
+      "materials": [
+        "d6ff8e9a-b41c-4f35-8af6-951e7dcdff4a@0b7b5",
+        "d6ff8e9a-b41c-4f35-8af6-951e7dcdff4a@b8673"
+      ],
+      "scenes": [
+        "d6ff8e9a-b41c-4f35-8af6-951e7dcdff4a@77db0"
+      ]
+    },
+    "materials": {
+      "d6ff8e9a-b41c-4f35-8af6-951e7dcdff4a@0b7b5": {
+        "__type__": "cc.Material",
+        "_name": "",
+        "_objFlags": 0,
+        "__editorExtras__": {},
+        "_native": "",
+        "_effectAsset": {
+          "__uuid__": "c8f66d17-351a-48da-a12c-0212d28575c4",
+          "__expectedType__": "cc.EffectAsset"
+        },
+        "_techIdx": 0,
+        "_defines": [
+          {},
+          {},
+          {},
+          {},
+          {},
+          {}
+        ],
+        "_states": [
+          {
+            "rasterizerState": {},
+            "depthStencilState": {},
+            "blendState": {
+              "targets": [
+                {}
+              ]
+            }
+          },
+          {
+            "rasterizerState": {},
+            "depthStencilState": {},
+            "blendState": {
+              "targets": [
+                {}
+              ]
+            }
+          },
+          {
+            "rasterizerState": {},
+            "depthStencilState": {},
+            "blendState": {
+              "targets": [
+                {}
+              ]
+            }
+          },
+          {
+            "rasterizerState": {},
+            "depthStencilState": {},
+            "blendState": {
+              "targets": [
+                {}
+              ]
+            }
+          },
+          {
+            "rasterizerState": {},
+            "depthStencilState": {},
+            "blendState": {
+              "targets": [
+                {}
+              ]
+            }
+          },
+          {
+            "rasterizerState": {},
+            "depthStencilState": {},
+            "blendState": {
+              "targets": [
+                {}
+              ]
+            }
+          }
+        ],
+        "_props": [
+          {
+            "tilingOffset": {
+              "__type__": "cc.Vec4",
+              "x": 16.9,
+              "y": 1,
+              "z": 13.3,
+              "w": 0
+            },
+            "emissive": {
+              "__type__": "cc.Color",
+              "r": 160,
+              "g": 160,
+              "b": 160,
+              "a": 255
+            }
+          },
+          {},
+          {},
+          {},
+          {},
+          {}
+        ]
+      }
+    }
+  }
+}

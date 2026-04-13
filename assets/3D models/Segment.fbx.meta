@@ -1,0 +1,78 @@
+{
+  "ver": "2.3.14",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "ecefcf98-555b-4652-9394-d76974f8b0f6",
+  "files": [],
+  "subMetas": {
+    "ed341": {
+      "importer": "gltf-mesh",
+      "uuid": "ecefcf98-555b-4652-9394-d76974f8b0f6@ed341",
+      "displayName": "",
+      "id": "ed341",
+      "name": "Sphere.001.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 340
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "543c4": {
+      "importer": "gltf-scene",
+      "uuid": "ecefcf98-555b-4652-9394-d76974f8b0f6@543c4",
+      "displayName": "",
+      "id": "543c4",
+      "name": "Segment.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [
+        "ecefcf98-555b-4652-9394-d76974f8b0f6@ed341"
+      ],
+      "skeletons": [],
+      "textures": [],
+      "materials": [],
+      "scenes": [
+        "ecefcf98-555b-4652-9394-d76974f8b0f6@543c4"
+      ]
+    }
+  }
+}

@@ -1,0 +1,302 @@
+import { _decorator, Component, Node, input, Input, EventMouse, EventTouch, AudioSource, AudioClip } from 'cc';
+import { Snake } from './Snake';
+import { FailedScreen } from './failedscreen';
+import { CTAScreen } from './CTAScreen';
+import { TutorialHand } from './TutorialHand';
+import { ALAnalytics } from './metrics';
+const { ccclass, property } = _decorator;
+
+@ccclass('GameManager')
+export class GameManager extends Component {
+
+    @property({ type: FailedScreen, tooltip: 'FailedScreen component reference' })
+    failedScreen: FailedScreen = null;
+
+    @property({ type: CTAScreen, tooltip: 'CTAScreen component reference' })
+    ctaScreen: CTAScreen = null;
+
+    @property({ type: TutorialHand, tooltip: 'TutorialHand component reference' })
+    tutorialHand: TutorialHand = null;
+
+    @property({ tooltip: 'Seconds after first click before showing CTA' })
+    gameTimerDuration: number = 40;
+
+    @property({ tooltip: 'Seconds of player idle before re-showing tutorial hand' })
+    tutorialIdleDuration: number = 6;
+
+    @property({ type: AudioSource, tooltip: 'Single AudioSource used to play gameplay SFX.' })
+    sfxAudioSource: AudioSource = null;
+
+    @property({ type: AudioClip, tooltip: 'Sound played when a snake is tapped.' })
+    tapSfx: AudioClip = null;
+
+    @property({ type: AudioClip, tooltip: 'Sound played when a wrong snake is clicked.' })
+    wrongTapSfx: AudioClip = null;
+
+    @property({ type: [Node], tooltip: 'Level root nodes. Each should contain Snake children. Levels are played in order.' })
+    levelNodes: Node[] = [];
+
+    private _timerActive: boolean = false;
+    private _timeRemaining: number = 0;
+    private _gameOver: boolean = false;
+    private _gameStarted: boolean = false;
+    private _initialSnakeCount: number = 0;
+    private _idleTimer: number = 0;
+    private _challengeStartedTracked: boolean = false;
+    private _pass25Tracked: boolean = false;
+    private _pass50Tracked: boolean = false;
+    private _pass75Tracked: boolean = false;
+    private _endcardTracked: boolean = false;
+
+    private _currentLevel: number = 0;
+    private _totalSnakesDone: number = 0;
+
+    onLoad() {
+        ALAnalytics.loading();
+    }
+
+    start() {
+        this._timeRemaining = this.gameTimerDuration;
+
+        input.on(Input.EventType.MOUSE_DOWN, this.onFirstInput, this);
+        input.on(Input.EventType.TOUCH_START, this.onFirstInput, this);
+        input.on(Input.EventType.MOUSE_DOWN, this.onAnyInput, this);
+        input.on(Input.EventType.TOUCH_START, this.onAnyInput, this);
+
+        // Listen for snake-done events (snake left the screen)
+        this.node.scene.on('snake-done', this._onSnakeDone, this);
+
+        this.scheduleOnce(() => {
+            // Count all snakes across all levels
+            this._initialSnakeCount = 0;
+            for (const lvl of this.levelNodes) {
+                if (!lvl) continue;
+                const snakes = lvl.getComponentsInChildren(Snake);
+                this._initialSnakeCount += snakes.length;
+            }
+            if (this._initialSnakeCount === 0) {
+                // Fallback: count all snakes in scene
+                const all = this.node.scene.getComponentsInChildren(Snake);
+                this._initialSnakeCount = all.length;
+            }
+            this._gameStarted = this._initialSnakeCount > 0;
+            ALAnalytics.loaded();
+            ALAnalytics.displayed();
+            if (this._gameStarted && !this._challengeStartedTracked) {
+                ALAnalytics.challengeStarted();
+                this._challengeStartedTracked = true;
+            }
+
+            // Activate only the first level, hide others
+            this._activateLevel(0);
+            this._showTutorialTarget();
+        }, 0);
+    }
+
+    onDestroy() {
+        input.off(Input.EventType.MOUSE_DOWN, this.onFirstInput, this);
+        input.off(Input.EventType.TOUCH_START, this.onFirstInput, this);
+        input.off(Input.EventType.MOUSE_DOWN, this.onAnyInput, this);
+        input.off(Input.EventType.TOUCH_START, this.onAnyInput, this);
+        this.node.scene.off('snake-done', this._onSnakeDone, this);
+    }
+
+    private _playSfx(clip: AudioClip | null) {
+        if (!clip) return;
+        const source = this.sfxAudioSource ?? this.getComponent(AudioSource);
+        source?.playOneShot(clip, 1.0);
+    }
+
+    private onFirstInput() {
+        if (this._timerActive || this._gameOver) return;
+        this._timerActive = true;
+        if (this._gameStarted && !this._challengeStartedTracked) {
+            ALAnalytics.challengeStarted();
+            this._challengeStartedTracked = true;
+        }
+        input.off(Input.EventType.MOUSE_DOWN, this.onFirstInput, this);
+        input.off(Input.EventType.TOUCH_START, this.onFirstInput, this);
+        console.log(`[GameManager] First input detected. Timer started: ${this.gameTimerDuration}s`);
+    }
+
+    private onAnyInput() {
+        this._idleTimer = 0;
+        if (this.tutorialHand) this.tutorialHand.hide();
+    }
+
+    // ── Level management ──────────────────────────────────────────────────────
+    private _activateLevel(index: number) {
+        this._currentLevel = index;
+        for (let i = 0; i < this.levelNodes.length; i++) {
+            if (this.levelNodes[i]) {
+                this.levelNodes[i].active = (i === index);
+            }
+        }
+        console.log(`[GameManager] Activated level ${index + 1} / ${this.levelNodes.length}`);
+    }
+
+    private _onSnakeDone() {
+        if (this._gameOver) return;
+        this._totalSnakesDone++;
+        this._trackProgressMilestones();
+
+        // Check if all snakes in the current level are done
+        const currentLevelNode = this.levelNodes[this._currentLevel];
+        if (currentLevelNode) {
+            const remaining = currentLevelNode.getComponentsInChildren(Snake);
+            // Snakes destroy themselves when done, so remaining = still active
+            if (remaining.length === 0) {
+                this._onLevelCleared();
+            }
+        } else {
+            // Fallback: check all snakes in scene
+            const allRemaining = this.node.scene.getComponentsInChildren(Snake);
+            if (allRemaining.length === 0) {
+                this._onLevelCleared();
+            }
+        }
+    }
+
+    private _onLevelCleared() {
+        const nextLevel = this._currentLevel + 1;
+        if (nextLevel < this.levelNodes.length) {
+            // Advance to next level after a short delay
+            console.log(`[GameManager] Level ${this._currentLevel + 1} cleared!`);
+            this.scheduleOnce(() => {
+                this._activateLevel(nextLevel);
+                this._showTutorialTarget();
+            }, 0.5);
+        } else {
+            // All levels complete → win
+            console.log(`[GameManager] All ${this.levelNodes.length} levels cleared!`);
+            this._triggerWin();
+        }
+    }
+
+    // ── Tutorial ──────────────────────────────────────────────────────────────
+    private _showTutorialTarget() {
+        if (!this.tutorialHand || this._gameOver) return;
+
+        const snakes = this._getActiveSnakes();
+        const moveable = snakes.filter(s => s.canMoveNow());
+        if (moveable.length === 0) return;
+
+        this.tutorialHand.attachTo(moveable[0]);
+    }
+
+    private _getActiveSnakes(): Snake[] {
+        const currentLevelNode = this.levelNodes[this._currentLevel];
+        if (currentLevelNode) {
+            return currentLevelNode.getComponentsInChildren(Snake);
+        }
+        return this.node.scene.getComponentsInChildren(Snake);
+    }
+
+    // ── End conditions ────────────────────────────────────────────────────────
+    private _findFailedScreen(node: Node | null): FailedScreen | null {
+        if (!node) return null;
+        const direct = node.getComponent(FailedScreen);
+        if (direct) return direct;
+        for (const child of node.children) {
+            const found = this._findFailedScreen(child);
+            if (found) return found;
+        }
+        return null;
+    }
+
+    private _findCtaScreen(node: Node | null): CTAScreen | null {
+        if (!node) return null;
+        const direct = node.getComponent(CTAScreen);
+        if (direct) return direct;
+        for (const child of node.children) {
+            const found = this._findCtaScreen(child);
+            if (found) return found;
+        }
+        return null;
+    }
+
+    private _resolveUiRefs() {
+        if (!this.failedScreen) {
+            const foundFailed = this._findFailedScreen(this.node.scene);
+            if (foundFailed) this.failedScreen = foundFailed;
+        }
+        if (!this.ctaScreen) {
+            const foundCta = this._findCtaScreen(this.node.scene);
+            if (foundCta) this.ctaScreen = foundCta;
+        }
+    }
+
+    private _forceActivateNodeChain(target: Node | null) {
+        let node = target;
+        while (node) {
+            if (!node.active) node.active = true;
+            node = node.parent;
+        }
+    }
+
+    private _triggerWin() {
+        if (this._gameOver) return;
+        this._gameOver = true;
+        this._timerActive = false;
+        ALAnalytics.challengeSolved();
+        if (this.tutorialHand) this.tutorialHand.hide();
+        this.showCTA();
+    }
+
+    private showCTA() {
+        this._resolveUiRefs();
+        console.log('[GameManager] showCTA called. ctaScreen:', !!this.ctaScreen);
+        if (this.ctaScreen) {
+            this._forceActivateNodeChain(this.ctaScreen.ctaCanvas ?? this.ctaScreen.node);
+            this.ctaScreen.show();
+        }
+        if (!this._endcardTracked) {
+            ALAnalytics.endcardShown();
+            this._endcardTracked = true;
+        }
+    }
+
+    private _trackProgressMilestones() {
+        if (this._initialSnakeCount <= 0) return;
+        const solvedRatio = this._totalSnakesDone / this._initialSnakeCount;
+
+        if (!this._pass25Tracked && solvedRatio >= 0.25) {
+            ALAnalytics.challengePass25();
+            this._pass25Tracked = true;
+        }
+        if (!this._pass50Tracked && solvedRatio >= 0.5) {
+            ALAnalytics.challengePass50();
+            this._pass50Tracked = true;
+        }
+        if (!this._pass75Tracked && solvedRatio >= 0.75) {
+            ALAnalytics.challengePass75();
+            this._pass75Tracked = true;
+        }
+    }
+
+    // ── Update ────────────────────────────────────────────────────────────────
+    update(deltaTime: number) {
+        if (this._gameOver) return;
+
+        // ── Tutorial idle timer ───────────────────────────────────────────
+        if (this.tutorialHand && !this.tutorialHand.isVisible()) {
+            this._idleTimer += deltaTime;
+            if (this._idleTimer >= this.tutorialIdleDuration) {
+                this._idleTimer = 0;
+                this._showTutorialTarget();
+            }
+        }
+
+        // ── Countdown timer ───────────────────────────────────────────────
+        if (this._timerActive) {
+            this._timeRemaining -= deltaTime;
+            if (this._timeRemaining <= 0) {
+                this._timeRemaining = 0;
+                this._timerActive = false;
+                // Timer expired → show CTA
+                console.log('[GameManager] Timer expired.');
+                this._triggerWin();
+            }
+        }
+    }
+}
