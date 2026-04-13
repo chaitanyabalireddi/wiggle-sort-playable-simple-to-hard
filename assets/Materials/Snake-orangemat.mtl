@@ -77,19 +77,17 @@
     {
       "mainColor": {
         "__type__": "cc.Color",
-        "r": 158,
-        "g": 57,
+        "r": 255,
+        "g": 122,
         "b": 0,
         "a": 255
       },
-      "occlusion": 0.681,
-      "roughness": 0.568,
-      "metallic": 0.046,
-      "specularIntensity": 0.785,
+      "roughness": 0.604,
+      "specularIntensity": 1,
       "emissive": {
         "__type__": "cc.Color",
-        "r": 230,
-        "g": 92,
+        "r": 92,
+        "g": 37,
         "b": 0,
         "a": 255
       }

@@ -48,13 +48,6 @@
       "mainTexture": {
         "__uuid__": "137698b1-0540-498f-92b7-7704413e4629@6c48a",
         "__expectedType__": "cc.Texture2D"
-      },
-      "mainColor": {
-        "__type__": "cc.Color",
-        "r": 241,
-        "g": 241,
-        "b": 241,
-        "a": 255
       }
     },
     {},

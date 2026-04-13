@@ -77,8 +77,8 @@
     {
       "mainColor": {
         "__type__": "cc.Color",
-        "r": 207,
-        "g": 183,
+        "r": 243,
+        "g": 207,
         "b": 0,
         "a": 255
       },
@@ -88,8 +88,8 @@
       "specularIntensity": 0.593,
       "emissive": {
         "__type__": "cc.Color",
-        "r": 190,
-        "g": 106,
+        "r": 172,
+        "g": 62,
         "b": 0,
         "a": 255
       }

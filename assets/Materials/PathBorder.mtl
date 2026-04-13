@@ -75,24 +75,26 @@
   ],
   "_props": [
     {
+      "tilingOffset": {
+        "__type__": "cc.Vec4",
+        "x": 1,
+        "y": 1,
+        "z": 10.4,
+        "w": 0
+      },
       "mainColor": {
         "__type__": "cc.Color",
-        "r": 253,
-        "g": 85,
-        "b": 255,
+        "r": 90,
+        "g": 90,
+        "b": 90,
         "a": 255
       },
-      "occlusion": 1,
-      "roughness": 0.547,
-      "specularIntensity": 0.821,
-      "emissive": {
-        "__type__": "cc.Color",
-        "r": 66,
-        "g": 0,
-        "b": 66,
-        "a": 255
-      },
-      "anisotropyRotation": 0.5858
+      "roughness": 0.613,
+      "specularIntensity": 0.378,
+      "mainTexture": {
+        "__uuid__": "4c0e1e39-505b-4036-bcc0-6d723ca56bd5@6c48a",
+        "__expectedType__": "cc.Texture2D"
+      }
     },
     {},
     {},
