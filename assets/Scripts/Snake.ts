@@ -467,21 +467,50 @@ export class Snake extends Component {
 	// ── Click handler ─────────────────────────────────────────────────────────
 	private onSnakeClicked() {
 		const now = Date.now();
-		if (now - this.lastClickTime < this.CLICK_DEBOUNCE_MS) return;
-		this.lastClickTime = now;
 
-		if (this._done || this._isEnteringHole) return;
+		// Debug logging to identify the issue
+		console.log(
+			`[Snake Click] ${this.snakeColor} - State: done=${this._done}, enteringHole=${this._isEnteringHole}, isMoving=${this._isMoving}, seekingHole=${this._seekingHole}, isBouncing=${this._isBouncing}, isShaking=${this._isShaking}`,
+		);
 
-		// If already moving, ignore the click (don't bounce back)
-		if (this._isMoving || this._seekingHole) {
+		// First, check if the snake is already destroyed or done
+		if (this._done || this._isEnteringHole) {
+			console.log(
+				`[Snake Click] ${this.snakeColor} - Rejected: done or entering hole`,
+			);
 			return;
 		}
 
-		if (this._isBouncing || this._isShaking) return;
+		// Debounce check - but reduce the debounce time for better responsiveness
+		if (now - this.lastClickTime < this.CLICK_DEBOUNCE_MS) {
+			console.log(
+				`[Snake Click] ${this.snakeColor} - Rejected: debounce`,
+			);
+			return;
+		}
+
+		// Check if the snake is in a "busy" state that prevents movement
+		// But allow clicking if it's just idle (not moving)
+		if (this._isMoving || this._seekingHole) {
+			console.log(
+				`[Snake Click] ${this.snakeColor} - Already moving or seeking hole, ignoring`,
+			);
+			return;
+		}
+
+		if (this._isBouncing || this._isShaking) {
+			console.log(
+				`[Snake Click] ${this.snakeColor} - Bouncing or shaking, ignoring`,
+			);
+			return;
+		}
 
 		// Check if blocked by other snakes that haven't left yet
 		const blockers = this.getActiveBlockers();
 		if (blockers.length > 0) {
+			console.log(
+				`[Snake Click] ${this.snakeColor} - Blocked by ${blockers.length} snakes`,
+			);
 			this.startBlockedShake();
 			for (const blocker of blockers) {
 				blocker.startBlockedShake();
@@ -490,6 +519,11 @@ export class Snake extends Component {
 			return;
 		}
 
+		// All checks passed - process the click
+		console.log(
+			`[Snake Click] ${this.snakeColor} - ACCEPTED, starting movement`,
+		);
+		this.lastClickTime = now;
 		this._emitSceneEvent("sfx-snake-tap");
 		this.saveOriginPose();
 		this.node.emit("snake-clicked", { snake: this });
