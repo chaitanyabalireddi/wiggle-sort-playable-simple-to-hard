@@ -834,7 +834,7 @@ export class Snake extends Component {
 			toHole.y = 0;
 			const distToHole = toHole.length();
 			if (distToHole < step) {
-				console.log("here - reached hole", distToHole, step);
+				// console.log("here - reached hole", distToHole, step);
 				// Snap head exactly to hole XZ, but keep the current arc Y
 				// so there's no pop — the entry animation will take it down from here
 				newHeadPos = this._seekHolePos.clone();
@@ -908,8 +908,15 @@ export class Snake extends Component {
 				Vec3.normalize(toHole, toHole);
 				newHeadPos = new Vec3();
 				Vec3.scaleAndAdd(newHeadPos, prevHeadPos, toHole, step);
-				// Keep Y the same - no vertical movement
-				newHeadPos.y = prevHeadPos.y;
+
+				// ── Upward then downward arc: sine curve peaking at +0.5y at midpoint ──
+				const progress =
+					this._seekHoleStartDist > 0
+						? 1 - distToHole / this._seekHoleStartDist // 0 at start → 1 at hole
+						: 0;
+				const arcY = Math.sin(progress * Math.PI) * 2; // peaks at progress=0.5
+				newHeadPos.y = prevHeadPos.y + (arcY - this._seekHoleLastArcY);
+				this._seekHoleLastArcY = arcY;
 			}
 		} else if (this.snakePath) {
 			// ── Path-based movement ──────────────────────────────────────────
