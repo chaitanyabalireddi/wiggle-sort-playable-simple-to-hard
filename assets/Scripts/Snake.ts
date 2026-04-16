@@ -16,6 +16,7 @@ import {
 	MeshRenderer,
 	Color,
 	ParticleSystem,
+	game,
 } from "cc";
 import { SnakePath } from "./SnakePath";
 
@@ -144,7 +145,8 @@ export class Snake extends Component {
 	private _enterHoleDuration: number = 0.3;
 	private _enterHoleCallback: (() => void) | null = null;
 	private _enterHolePose: Vec3[] = [];
-
+	private _seekHoleStartDist: number = 0;
+	private _seekHoleLastArcY: number = 0;
 	// ─────────────────────────────────────────────────────────────────────────
 	// Legacy compat — _isJoining / _hasFinishedJoining kept so external
 	// references (GameManager, TutorialHand) don't break, but the queue no
@@ -619,7 +621,6 @@ export class Snake extends Component {
 		this._hasFinishedJoining = false;
 	}
 
-	// ── Update ────────────────────────────────────────────────────────────────
 	update(deltaTime: number) {
 		if (this._done) return;
 		this.time += deltaTime;
@@ -830,11 +831,38 @@ export class Snake extends Component {
 			// ── Seeking hole ─────────────────────────────────────────────────
 			const toHole = new Vec3();
 			Vec3.subtract(toHole, this._seekHolePos, prevHeadPos);
+			toHole.y = 0;
 			const distToHole = toHole.length();
-
-			if (distToHole <= step) {
+			if (distToHole < step) {
+				console.log("here - reached hole", distToHole, step);
+				// Snap head exactly to hole XZ, but keep the current arc Y
+				// so there's no pop — the entry animation will take it down from here
 				newHeadPos = this._seekHolePos.clone();
+				newHeadPos.y = prevHeadPos.y; // don't snap Y, let entry anim handle it
+
+				// Write final seeking position into history before switching states
+				const actualStep = Vec3.distance(prevHeadPos, newHeadPos);
+				this.totalDist += actualStep;
+				this.headHistIdx = (this.headHistIdx + 1) % this.HISTORY_SIZE;
+				this.headHistory[this.headHistIdx] = newHeadPos.clone();
+				this.headDistHist[this.headHistIdx] = this.totalDist;
+				this.headNode.setWorldPosition(newHeadPos);
+
+				// Update body segments one last time at seeking state
+				for (let i = 0; i < this.bodySegments.length; i++) {
+					const seg = this.bodySegments[i];
+					if (!seg?.active) continue;
+					const prevSegPos = seg.getWorldPosition();
+					const lagDist = this.totalDist - this.segmentLags[i];
+					const segPos = this.sampleHistory(lagDist);
+					seg.setWorldPosition(segPos);
+					this.faceMovementDirection(seg, prevSegPos, segPos);
+				}
+
+				// Reset arc state and transition
+				this._seekHoleLastArcY = 0;
 				this._seekingHole = false;
+				// this._isMoving = false;
 				this._isEnteringHole = true;
 				this._enterHolePos.set(this._seekHolePos);
 				this._enterHoleProgress = 0;
@@ -872,10 +900,16 @@ export class Snake extends Component {
 					if (hole?.advanceColor) hole.advanceColor();
 				};
 				this._emitSceneEvent("sfx-snake-enter-hole");
+
+				// Return early — history/position already written above
+				return;
 			} else {
+				// Move horizontally toward the hole
 				Vec3.normalize(toHole, toHole);
 				newHeadPos = new Vec3();
 				Vec3.scaleAndAdd(newHeadPos, prevHeadPos, toHole, step);
+				// Keep Y the same - no vertical movement
+				newHeadPos.y = prevHeadPos.y;
 			}
 		} else if (this.snakePath) {
 			// ── Path-based movement ──────────────────────────────────────────
@@ -890,8 +924,6 @@ export class Snake extends Component {
 
 			if (distToPath > 0.1) {
 				// Phase 1: walking toward the path entry point.
-				// Stop only if a segment of another on-path snake is within
-				// collisionRadius — i.e. we'd physically touch it.
 				Vec3.normalize(toTarget, toTarget);
 				const candidatePos = new Vec3();
 				Vec3.scaleAndAdd(
@@ -928,8 +960,6 @@ export class Snake extends Component {
 					this._hasFinishedJoining = true;
 				}
 
-				// Only yield to a snake with higher pathTraveled (they were here first).
-				// Use collisionRadius so we stop right when we'd touch — not 4 units away.
 				if (this.mustYieldToHigherPrioritySnake(prevHeadPos)) {
 					newHeadPos = prevHeadPos.clone();
 					this._waitingForPathClear = true;
@@ -1350,9 +1380,20 @@ export class Snake extends Component {
 		}
 
 		if (bestHoleNode) {
-			this._seekingHole = true;
+			// IMPORTANT: Set the hole position FIRST
 			this._seekHolePos.set(bestHolePos);
+			// THEN calculate the distance using the correct position
+			this._seekHoleStartDist = Vec3.distance(
+				this.headNode.getWorldPosition(),
+				this._seekHolePos,
+			);
+			this._seekHoleLastArcY = 0;
+			this._seekingHole = true;
 			this._seekHoleNode = bestHoleNode;
+
+			console.log(
+				`[Hole Seek] Started seeking hole at distance: ${this._seekHoleStartDist}`,
+			);
 		}
 	}
 
