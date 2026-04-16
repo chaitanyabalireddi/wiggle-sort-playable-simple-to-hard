@@ -69,7 +69,7 @@
       "__id__": 3
     },
     "headPrefab": {
-      "__uuid__": "96a1c303-d69c-4555-be26-c7bc3a4b289d",
+      "__uuid__": "ef2b2151-ccf8-4817-8d70-8072745e659d",
       "__expectedType__": "cc.Prefab"
     },
     "segmentPrefab": {
@@ -79,10 +79,21 @@
     "segmentCount": 10,
     "segmentSpacing": 0,
     "headAttachOffset": 0,
+    "headTipNode": null,
     "moveSpeed": 1,
     "wiggleAmount": 0,
     "wiggleSpeed": 0,
     "snakeColor": "green",
+    "existingHead": null,
+    "existingSegments": [],
+    "directionTarget": null,
+    "collisionRadius": 0.6,
+    "offScreenDistance": 20,
+    "blockedBy": [],
+    "snakePath": null,
+    "holeSeekRadius": 5,
+    "pathClearanceRadius": 4,
+    "minGapToResume": 3,
     "_id": ""
   },
   {

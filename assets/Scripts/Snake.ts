@@ -17,6 +17,8 @@ import {
 	Color,
 	ParticleSystem,
 	game,
+	BoxCollider,
+	PhysicsSystem,
 } from "cc";
 import { SnakePath } from "./SnakePath";
 
@@ -166,7 +168,9 @@ export class Snake extends Component {
 		this.createSnake();
 		this.seedHistoryFromPose();
 		this.computeHeadDirection();
-
+		const box = this.headNode.addComponent(BoxCollider);
+		const size = new Vec3(3, 3, 3);
+		box.size = size;
 		// Auto-discover path from parent level node if not manually assigned
 		if (!this.snakePath) {
 			this.snakePath = this.findPathInParents();
@@ -224,16 +228,20 @@ export class Snake extends Component {
 		const cam = this.findMainCamera();
 		if (!cam) return;
 		const ray = cam.screenPointToRay(sx, sy);
-		if (this.checkRayIntersection(ray, this.headNode)) {
-			this.onSnakeClicked();
+		if (PhysicsSystem.instance.raycastClosest(ray)) {
+			if (
+				PhysicsSystem.instance.raycastClosestResult.collider.node
+					.parent === this.node
+			)
+				this.onSnakeClicked();
 			return;
 		}
-		for (const seg of this.bodySegments) {
-			if (this.checkRayIntersection(ray, seg)) {
-				this.onSnakeClicked();
-				return;
-			}
-		}
+		// for (const seg of this.bodySegments) {
+		// 	if (this.checkRayIntersection(ray, seg)) {
+		// 		this.onSnakeClicked();
+		// 		return;
+		// 	}
+		// }
 	}
 
 	private findMainCamera(): Camera | null {
@@ -243,22 +251,22 @@ export class Snake extends Component {
 		return n ? n.getComponent(Camera) : null;
 	}
 
-	private checkRayIntersection(
-		ray: geometry.Ray,
-		target: Node | null,
-	): boolean {
-		if (!target?.active) return false;
-		const wp = target.getWorldPosition();
-		const tp = new Vec3();
-		Vec3.subtract(tp, wp, ray.o);
-		const t = Vec3.dot(tp, ray.d);
-		if (t < 0) return false;
-		const cl = new Vec3();
-		Vec3.scaleAndAdd(cl, ray.o, ray.d, t);
-		const dv = new Vec3();
-		Vec3.subtract(dv, cl, wp);
-		return Vec3.dot(dv, dv) < 0.2;
-	}
+	// private checkRayIntersection(
+	// 	ray: geometry.Ray,
+	// 	target: Node | null,
+	// ): boolean {
+	// 	if (!target?.active) return false;
+	// 	const wp = target.getWorldPosition();
+	// 	const tp = new Vec3();
+	// 	Vec3.subtract(tp, wp, ray.o);
+	// 	const t = Vec3.dot(tp, ray.d);
+	// 	if (t < 0) return false;
+	// 	const cl = new Vec3();
+	// 	Vec3.scaleAndAdd(cl, ray.o, ray.d, t);
+	// 	const dv = new Vec3();
+	// 	Vec3.subtract(dv, cl, wp);
+	// 	return Vec3.dot(dv, dv) < 0.2;
+	// }
 
 	// ── Color ─────────────────────────────────────────────────────────────────
 	private getSnakeColor(): Color {
@@ -665,7 +673,11 @@ export class Snake extends Component {
 		// ── Hole entry animation ─────────────────────────────────────────────
 		if (this._isEnteringHole) {
 			const step = this.moveSpeed * deltaTime;
-
+			this.node.getChildByName("Head").getChildByName("Eyelid").active =
+				false;
+			this.node
+				.getChildByName("Head")
+				.getChildByName("Eyelid-001").active = false;
 			// Get current head position
 			const headCurrentPos = this.headNode.getWorldPosition();
 			const toHole = new Vec3();
@@ -1397,6 +1409,7 @@ export class Snake extends Component {
 			this._seekHoleLastArcY = 0;
 			this._seekingHole = true;
 			this._seekHoleNode = bestHoleNode;
+			this.moveSpeed *= 2;
 
 			console.log(
 				`[Hole Seek] Started seeking hole at distance: ${this._seekHoleStartDist}`,

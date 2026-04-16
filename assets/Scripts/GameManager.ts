@@ -14,6 +14,7 @@ import {
 	Label,
 	tween,
 	Vec3,
+	Color,
 } from "cc";
 import { Snake } from "./Snake";
 import { ConfettiManager } from "./ConfettiManager";
@@ -86,6 +87,9 @@ export class GameManager extends Component {
 			"Camera ortho height per level. Index must match levelNodes. Leave empty to keep default.",
 	})
 	levelOrthoHeights: number[] = [];
+
+	@property([Color])
+	levelColors: Color[] = [];
 
 	@property({
 		type: Prefab,
@@ -249,6 +253,7 @@ export class GameManager extends Component {
 		) {
 			const cam = this._findMainCamera();
 			if (cam) {
+				cam.clearColor = this.levelColors[index];
 				cam.orthoHeight = this.levelOrthoHeights[index];
 			}
 		}
