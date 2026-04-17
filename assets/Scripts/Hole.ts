@@ -90,6 +90,12 @@ export class Hole extends Component {
 	})
 	isNextPreview: boolean = false;
 
+	@property({
+		tooltip:
+			"For multi-hole levels: unique identifier to pair a preview hole with its main hole. Main hole and its preview should have the same ID.",
+	})
+	holeSetId: number = 0;
+
 	private _evalTimer: number = 0;
 	private _currentIndex: number = 0;
 	public _nextIndex: number = -1; // -1 = no next candidate (show empty/black)
@@ -104,18 +110,49 @@ export class Hole extends Component {
 				this.node.getComponentInChildren(MeshRenderer);
 		}
 
+		// Get colors used by other main holes for initialization
+		const getOtherMainHoleColors = (): string[] => {
+			const colors: string[] = [];
+			const levelRoot = this.findLevelRoot();
+			if (levelRoot) {
+				const allHoles = levelRoot.getComponentsInChildren("Hole") as any[];
+				for (const h of allHoles) {
+					if (h.node !== this.node && !h.isNextPreview && h._currentColorName) {
+						colors.push(h._currentColorName);
+					}
+				}
+			}
+			return colors;
+		};
+
 		if (this.colorMappings.length >= 2) {
 			// Start with the first colorMapping as the initial color
+			// Stagger by holeSetId so holes with lower IDs initialize first
+			const initDelay = this.isNextPreview ? 0.05 : this.holeSetId * 0.1;
 			this.scheduleOnce(() => {
-				this._currentIndex = 0;
+				const otherColors = getOtherMainHoleColors();
+				console.log(`[Hole ${this.node.name}] initDelay=${initDelay}, otherColors=[${otherColors.join(",")}], holeSetId=${this.holeSetId}`);
+				// Find a color not used by other main holes
+				let startIndex = 0;
+				for (let i = 0; i < this.colorMappings.length; i++) {
+					const col = this.colorMappings[i]?.colorName?.toLowerCase().trim() ?? "";
+					if (otherColors.indexOf(col) === -1) {
+						startIndex = i;
+						break;
+					}
+				}
+				this._currentIndex = startIndex;
 				this._currentColorName =
-					this.colorMappings[0]?.colorName?.toLowerCase().trim() ??
+					this.colorMappings[startIndex]?.colorName?.toLowerCase().trim() ??
 					"";
 				this._nextIndex = this.getBestCandidateIndex();
+				console.log(`[Hole ${this.node.name}] initialized with color=${this._currentColorName}, next=${this._nextColorName}`);
 				this.updateMaterials();
-			}, 0);
+			}, initDelay);
 		} else {
 			// No colorMappings — auto-detect from first snake in scene
+			// Stagger by holeSetId so holes with lower IDs initialize first
+			const initDelay = this.isNextPreview ? 0.05 : this.holeSetId * 0.1;
 			this.scheduleOnce(() => {
 				const snakes = this.node.scene.getComponentsInChildren(Snake);
 				const active = snakes.filter(
@@ -124,8 +161,14 @@ export class Hole extends Component {
 						!s.isDone() &&
 						!s.isEnteringHole(),
 				);
+				const otherColors = getOtherMainHoleColors();
 				if (active.length > 0) {
-					this._currentColorName = active[0].snakeColor
+					// Find first snake with color not used by other holes
+					const availableSnake = active.find((s) => {
+						const col = s.snakeColor.toLowerCase().trim();
+						return otherColors.indexOf(col) === -1;
+					}) || active[0];
+					this._currentColorName = availableSnake.snakeColor
 						.toLowerCase()
 						.trim();
 					this.applyColorToRenderer(
@@ -156,7 +199,7 @@ export class Hole extends Component {
 						}
 					}
 				}
-			}, 0);
+			}, initDelay);
 		}
 	}
 
@@ -245,18 +288,60 @@ export class Hole extends Component {
 		const snakes = this.node.scene.getComponentsInChildren(Snake);
 		const active = this._getActiveSnakes(snakes);
 
+		// Get colors used by other MAIN holes (not previews)
+		const otherHoles: any[] = [];
+		const levelRoot = this.findLevelRoot();
+		if (levelRoot) {
+			const allHoles = levelRoot.getComponentsInChildren("Hole") as any[];
+			for (const h of allHoles)
+				if (h.node !== this.node && !h.isNextPreview) otherHoles.push(h);
+		}
+		const otherHoleColors = otherHoles.map(h => h.getCurrentColorName()).filter(c => c !== "");
+
 		if (this.colorMappings.length >= 2) {
 			const currentCol = this.getCurrentColorName();
 
 			// ALWAYS try to pick a DIFFERENT color first (no consecutive repeats)
-			const easiestIdx = this.getEasiestSnakeIndex();
+			let easiestIdx = this.getEasiestSnakeIndex();
 
 			if (easiestIdx !== -1) {
-				// getEasiestSnakeIndex already excludes currentIndex, so this is a different color
+				// Check if this color is used by another main hole - if so, must pick different
+				let proposedColor = this.colorMappings[easiestIdx]?.colorName?.toLowerCase().trim() ?? "";
+				if (otherHoleColors.indexOf(proposedColor) !== -1) {
+					// Find any color not used by other holes
+					const availableColors = this.colorMappings.filter((m, idx) => {
+						const col = m.colorName.toLowerCase().trim();
+						return col !== currentCol && otherHoleColors.indexOf(col) === -1;
+					});
+					if (availableColors.length > 0) {
+						// Pick first available color that has an active snake
+						for (const mapping of availableColors) {
+							const col = mapping.colorName.toLowerCase().trim();
+							const hasSnake = active.some(s => s.snakeColor.toLowerCase().trim() === col);
+							if (hasSnake) {
+								easiestIdx = this.colorMappings.findIndex(m => m.colorName.toLowerCase().trim() === col);
+								break;
+							}
+						}
+					}
+				}
 				this._currentIndex = easiestIdx;
 			} else if (this._nextIndex !== -1) {
-				// Fallback to next index
-				this._currentIndex = this._nextIndex;
+				// Fallback to next index - but check it's not used by other hole
+				let nextCol = this.colorMappings[this._nextIndex]?.colorName?.toLowerCase().trim() ?? "";
+				if (otherHoleColors.indexOf(nextCol) !== -1) {
+					// Find any available color
+					for (let i = 0; i < this.colorMappings.length; i++) {
+						if (i === this._currentIndex) continue;
+						const col = this.colorMappings[i]?.colorName?.toLowerCase().trim();
+						if (col && otherHoleColors.indexOf(col) === -1) {
+							this._currentIndex = i;
+							break;
+						}
+					}
+				} else {
+					this._currentIndex = this._nextIndex;
+				}
 			}
 			// If neither found a different color, _currentIndex stays the same (only same-color snakes left)
 
@@ -265,6 +350,25 @@ export class Hole extends Component {
 					?.toLowerCase()
 					.trim() ?? "";
 
+			// FINAL CHECK: Ensure we're not using a color from another main hole
+			if (otherHoleColors.indexOf(this._currentColorName) !== -1 && active.length > 0) {
+				// Force pick a different color
+				const differentSnake = active.find((s) => {
+					const col = s.snakeColor.toLowerCase().trim();
+					return col !== this._currentColorName && otherHoleColors.indexOf(col) === -1;
+				});
+				if (differentSnake) {
+					const snakeCol = differentSnake.snakeColor.toLowerCase().trim();
+					const idx = this.colorMappings.findIndex(
+						(m) => m.colorName.toLowerCase().trim() === snakeCol,
+					);
+					if (idx !== -1) {
+						this._currentIndex = idx;
+						this._currentColorName = snakeCol;
+					}
+				}
+			}
+
 			if (active.length > 0) {
 				const hasMatch = active.some(
 					(s) =>
@@ -272,8 +376,11 @@ export class Hole extends Component {
 						this._currentColorName,
 				);
 				if (!hasMatch) {
-					// Current color has no snake — pick any active snake
-					const anySnake = active[0];
+					// Current color has no snake — pick any active snake that's not used by other holes
+					const anySnake = active.find((s) => {
+						const col = s.snakeColor.toLowerCase().trim();
+						return otherHoleColors.indexOf(col) === -1;
+					}) || active[0];
 					const snakeCol = anySnake.snakeColor.toLowerCase().trim();
 					const idx = this.colorMappings.findIndex(
 						(m) => m.colorName.toLowerCase().trim() === snakeCol,
@@ -308,7 +415,7 @@ export class Hole extends Component {
 						"Hole",
 					) as any[];
 					for (const h of allHoles)
-						if (h.node !== this.node) otherHoles.push(h);
+						if (h.node !== this.node && !h.isNextPreview) otherHoles.push(h);
 				}
 
 				const otherColors = otherHoles.map((h) =>
@@ -556,6 +663,10 @@ export class Hole extends Component {
 			}
 		}
 
+		// Collect colors to avoid (current and next from other holes)
+		const otherHoleCurrentColors = otherHoles.map(h => h.getCurrentColorName());
+		const otherHoleNextColors = otherHoles.map(h => h._nextColorName).filter(c => c !== "");
+
 		type Candidate = {
 			colorIndex: number;
 			color: string;
@@ -584,6 +695,12 @@ export class Hole extends Component {
 			if (mappingIdx === this._currentIndex) continue;
 			// ───────────────────────────────────────────────────────────────────
 
+			// ── FIX: Next color must NOT be used by other main holes ────────────
+			// Check both current AND next colors of other holes
+			if (otherHoleCurrentColors.indexOf(snakeCol) !== -1) continue;
+			if (otherHoleNextColors.indexOf(snakeCol) !== -1) continue;
+			// ───────────────────────────────────────────────────────────────────
+
 			const dist = Vec3.distance(headNode.getWorldPosition(), holePos);
 
 			// EASE SCORE: lower = easier
@@ -591,12 +708,6 @@ export class Hole extends Component {
 			if (snake.isFrontBlocked()) easeScore += 100;
 			if (snake.isMovingNow()) easeScore -= 20;
 			if (snake.isSeekingHole()) easeScore -= 30;
-
-			for (const otherHole of otherHoles) {
-				if (otherHole.getCurrentColorName() === snakeCol) {
-					easeScore += 500;
-				}
-			}
 
 			candidates.push({
 				colorIndex: mappingIdx,
@@ -619,6 +730,10 @@ export class Hole extends Component {
 
 				// Skip if it's the current color
 				if (snakeCol === currentCol) continue;
+
+				// Skip if used by other holes (current or next)
+				if (otherHoleCurrentColors.indexOf(snakeCol) !== -1) continue;
+				if (otherHoleNextColors.indexOf(snakeCol) !== -1) continue;
 
 				const hasMapping = this.colorMappings.some(
 					(m) => m.colorName.toLowerCase().trim() === snakeCol,
@@ -758,13 +873,18 @@ export class Hole extends Component {
 		if (!levelRoot) return;
 
 		const allHoles = levelRoot.getComponentsInChildren("Hole") as any[];
+		// Find main hole with EXACT matching holeSetId
 		const mainHole = allHoles.find(
-			(h) => h.node !== this.node && !h.isNextPreview,
+			(h) =>
+				h.node !== this.node &&
+				!h.isNextPreview &&
+				h.holeSetId === this.holeSetId,
 		);
 
 		if (mainHole) {
 			const nextIdx = mainHole._nextIndex;
 			const nextCol = mainHole._nextColorName;
+			console.log(`[Hole ${this.node.name}] preview syncing to main hole ${mainHole.node.name}, nextColor=${nextCol}`);
 
 			if (
 				this._currentIndex !== nextIdx ||
@@ -775,6 +895,8 @@ export class Hole extends Component {
 				this._nextIndex = -1; // Previews don't have their own "next"
 				this.updateMaterials();
 			}
+		} else {
+			console.warn(`[Hole ${this.node.name}] preview could not find main hole with holeSetId=${this.holeSetId}`);
 		}
 	}
 

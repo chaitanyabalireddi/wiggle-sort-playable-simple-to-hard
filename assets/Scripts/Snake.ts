@@ -331,9 +331,20 @@ export class Snake extends Component {
 				}
 			}
 		} else {
-			this.bodySegments = this.node.children.filter(
-				(c) => c !== this.headNode,
-			);
+			// Auto-detect segments from children with "Segment" in name, in hierarchy order
+			const segmentNodes = this.node.children
+				.filter((c) => c !== this.headNode && c.name.toLowerCase().includes("segment"));
+			
+			if (segmentNodes.length > 0) {
+				// Keep hierarchy order (children array order)
+				this.bodySegments = segmentNodes;
+				console.log(`[Snake ${this.node.name}] Auto-detected ${segmentNodes.length} segments in hierarchy order: [${segmentNodes.map(s => s.name).join(", ")}]`);
+			} else {
+				// Fallback: use all non-head children
+				this.bodySegments = this.node.children.filter(
+					(c) => c !== this.headNode,
+				);
+			}
 		}
 	}
 
@@ -1374,6 +1385,8 @@ export class Snake extends Component {
 		for (const holeNode of holeNodes) {
 			const hole = holeNode.getComponent("Hole") as any;
 			if (!hole) continue;
+			// Skip preview holes - snakes should only enter main holes
+			if (hole.isNextPreview) continue;
 			const holeColor: string = hole.getCurrentColorName?.() ?? "";
 			if (!holeColor) continue;
 

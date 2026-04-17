@@ -388,16 +388,28 @@ export class GameManager extends Component {
 			}
 		}
 
-		// Find the hole in the current level
+		// Find all holes in the current level
 		const currentLevelNode = this.levelNodes[this._currentLevel];
-		let hole: Hole | null = null;
+		let holes: Hole[] = [];
 		if (currentLevelNode) {
-			hole = currentLevelNode.getComponentInChildren(Hole);
+			holes = currentLevelNode.getComponentsInChildren(Hole).filter(
+				(h: Hole) => !h.isNextPreview
+			);
+		}
+		// If no holes or empty, fallback to scene search
+		if (holes.length === 0) {
+			holes = this.node.scene.getComponentsInChildren(Hole).filter(
+				(h: Hole) => !h.isNextPreview
+			);
 		}
 
-		const holePos = hole ? hole.getCenterWorldPosition() : null;
-		const currentColor = hole ? hole.getCurrentColorName() : "";
-		const nextColor = hole ? hole._nextColorName || "" : "";
+		// For tutorial, we'll use the first hole's position, but check all holes for matching colors
+		const primaryHole = holes.length > 0 ? holes[0] : null;
+		const holePos = primaryHole ? primaryHole.getCenterWorldPosition() : null;
+
+		// Get all current colors from all holes
+		const allCurrentColors = holes.map(h => h.getCurrentColorName()).filter(c => c !== "");
+		const allNextColors = holes.map(h => h._nextColorName || "").filter(c => c !== "");
 
 		// Helper: pick the closest unblocked snake from a list
 		const pickClosest = (list: Snake[]): Snake | null => {
@@ -417,21 +429,23 @@ export class GameManager extends Component {
 			return best;
 		};
 
-		// TIER 1: Moveable+unblocked snake matching hole's CURRENT color
+		// TIER 1: Moveable+unblocked snake matching any hole's CURRENT color
+		const primaryCurrentColor = allCurrentColors.length > 0 ? allCurrentColors[0] : "";
 		console.log(
-			`[Tutorial] TIER 1: currentColor='${currentColor}', moveable count=${moveable.length}`,
+			`[Tutorial] TIER 1: currentColors='${allCurrentColors.join(",")}', moveable count=${moveable.length}`,
 		);
 		for (const s of moveable) {
 			console.log(
 				`[Tutorial]  moveable snake: name=${s.node.name}, color=${s.snakeColor}, blockers=${s.getActiveBlockers().length}`,
 			);
 		}
-		if (currentColor && moveable.length > 0) {
+		if (allCurrentColors.length > 0 && moveable.length > 0) {
+			// Find snakes matching any of the current colors needed by holes
 			const matching = moveable.filter(
-				(s) => s.snakeColor.toLowerCase().trim() === currentColor,
+				(s) => allCurrentColors.indexOf(s.snakeColor.toLowerCase().trim()) !== -1,
 			);
 			console.log(
-				`[Tutorial]  matching '${currentColor}' count=${matching.length}`,
+				`[Tutorial]  matching any current color count=${matching.length}`,
 			);
 			for (const s of matching) {
 				console.log(`[Tutorial]    matching snake: ${s.node.name}`);
@@ -446,7 +460,7 @@ export class GameManager extends Component {
 
 		// TIER 2: Current-color snake is blocked — trace the blocker chain
 		// to find the first moveable, unblocked snake that needs to be tapped first
-		if (currentColor) {
+		if (allCurrentColors.length > 0) {
 			const getFirstMoveableInChain = (snake: Snake): Snake | null => {
 				if (!snake.canMoveNow()) return null;
 				const blockers = snake.getActiveBlockers();
@@ -459,10 +473,11 @@ export class GameManager extends Component {
 				return null;
 			};
 
+			const snakeColorMatches = (s: Snake) =>
+				allCurrentColors.indexOf(s.snakeColor.toLowerCase().trim()) !== -1;
+
 			const blockedMatch = alive.filter(
-				(s) =>
-					s.snakeColor.toLowerCase().trim() === currentColor &&
-					s.canMoveNow(),
+				(s) => snakeColorMatches(s) && s.canMoveNow(),
 			);
 			for (const blocked of blockedMatch) {
 				const first = getFirstMoveableInChain(blocked);
@@ -473,10 +488,10 @@ export class GameManager extends Component {
 			}
 		}
 
-		// TIER 3: Moveable+unblocked snake matching hole's NEXT color
-		if (nextColor && moveable.length > 0) {
+		// TIER 3: Moveable+unblocked snake matching any hole's NEXT color
+		if (allNextColors.length > 0 && moveable.length > 0) {
 			const matching = moveable.filter(
-				(s) => s.snakeColor.toLowerCase().trim() === nextColor,
+				(s) => allNextColors.indexOf(s.snakeColor.toLowerCase().trim()) !== -1,
 			);
 			const best = pickClosest(matching);
 			if (best) {
