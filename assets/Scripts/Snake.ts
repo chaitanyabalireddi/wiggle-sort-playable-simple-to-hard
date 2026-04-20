@@ -318,7 +318,6 @@ export class Snake extends Component {
 					c.name.toLowerCase().includes("head"),
 				);
 		}
-
 		if (this.existingSegments.length > 0) {
 			this.bodySegments = [...this.existingSegments];
 		} else if (this.node.children.length <= 1) {
@@ -332,13 +331,18 @@ export class Snake extends Component {
 			}
 		} else {
 			// Auto-detect segments from children with "Segment" in name, in hierarchy order
-			const segmentNodes = this.node.children
-				.filter((c) => c !== this.headNode && c.name.toLowerCase().includes("segment"));
-			
+			const segmentNodes = this.node.children.filter(
+				(c) =>
+					c !== this.headNode &&
+					c.name.toLowerCase().includes("segment"),
+			);
+
 			if (segmentNodes.length > 0) {
 				// Keep hierarchy order (children array order)
 				this.bodySegments = segmentNodes;
-				console.log(`[Snake ${this.node.name}] Auto-detected ${segmentNodes.length} segments in hierarchy order: [${segmentNodes.map(s => s.name).join(", ")}]`);
+				console.log(
+					`[Snake ${this.node.name}] Auto-detected ${segmentNodes.length} segments in hierarchy order: [${segmentNodes.map((s) => s.name).join(", ")}]`,
+				);
 			} else {
 				// Fallback: use all non-head children
 				this.bodySegments = this.node.children.filter(
@@ -851,6 +855,7 @@ export class Snake extends Component {
 		let newHeadPos: Vec3;
 
 		if (this._seekingHole) {
+			console.log("SEEKING");
 			// ── Seeking hole ─────────────────────────────────────────────────
 			const toHole = new Vec3();
 			Vec3.subtract(toHole, this._seekHolePos, prevHeadPos);
@@ -1362,7 +1367,8 @@ export class Snake extends Component {
 	}
 
 	private _checkForNearbyHole(headPos: Vec3) {
-		if (this._seekingHole || this._isEnteringHole || this._done) return;
+		// Remove _seekingHole from the early return - allow re-evaluation
+		if (this._isEnteringHole || this._done) return;
 		const myColor = this.snakeColor.toLowerCase().trim();
 		if (!myColor) return;
 
@@ -1412,21 +1418,56 @@ export class Snake extends Component {
 		}
 
 		if (bestHoleNode) {
-			// IMPORTANT: Set the hole position FIRST
-			this._seekHolePos.set(bestHolePos);
-			// THEN calculate the distance using the correct position
-			this._seekHoleStartDist = Vec3.distance(
-				this.headNode.getWorldPosition(),
-				this._seekHolePos,
-			);
-			this._seekHoleLastArcY = 0;
-			this._seekingHole = true;
-			this._seekHoleNode = bestHoleNode;
-			this.moveSpeed *= 2;
+			const isDifferentHole = this._seekHoleNode !== bestHoleNode;
+			if (!this._seekingHole || isDifferentHole) {
+				this._seekHolePos.set(bestHolePos);
 
-			console.log(
-				`[Hole Seek] Started seeking hole at distance: ${this._seekHoleStartDist}`,
-			);
+				// XZ-only distance so arc progress matches the toHole.y=0 measurement in update
+				const headPos3D = this.headNode.getWorldPosition();
+				const dx = headPos3D.x - bestHolePos.x;
+				const dz = headPos3D.z - bestHolePos.z;
+				this._seekHoleStartDist = Math.sqrt(dx * dx + dz * dz);
+
+				this._seekHoleLastArcY = 0;
+				this._seekingHole = true;
+				this._seekHoleNode = bestHoleNode;
+
+				// Only boost speed the very first time, never again
+				if (!this._hasAppliedHoleSpeedBoost) {
+					this._hasAppliedHoleSpeedBoost = true;
+					this.moveSpeed *= this.bodySegments.length > 12 ? 3 : 2;
+				}
+
+				console.log(
+					`[Hole Seek] ${isDifferentHole ? "SWITCHED TO" : "Started seeking"} hole at distance: ${this._seekHoleStartDist}`,
+				);
+			}
+		}
+	}
+	private _hasAppliedHoleSpeedBoost: boolean = false;
+
+	public seekHole(
+		holeNode: Node,
+		holeWorldPos: Vec3,
+		onComplete?: () => void,
+	) {
+		if (this._isEnteringHole || this._done || this._seekingHole) return;
+		if (!this._isMoving) return;
+
+		const headPos = this.headNode.getWorldPosition();
+		const dx = headPos.x - holeWorldPos.x;
+		const dz = headPos.z - holeWorldPos.z;
+
+		this._seekHolePos.set(holeWorldPos);
+		this._seekHoleStartDist = Math.sqrt(dx * dx + dz * dz);
+		this._seekHoleLastArcY = 0;
+		this._seekingHole = true;
+		this._seekHoleNode = holeNode;
+		this._enterHoleCallback = onComplete || null;
+
+		if (!this._hasAppliedHoleSpeedBoost) {
+			this._hasAppliedHoleSpeedBoost = true;
+			this.moveSpeed *= 3;
 		}
 	}
 
