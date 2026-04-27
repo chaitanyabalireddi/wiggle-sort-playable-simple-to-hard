@@ -1,0 +1,42 @@
+{
+  "ver": "1.0.27",
+  "importer": "image",
+  "imported": true,
+  "uuid": "3a25bdbd-a9f1-4b12-975a-d3103049e5d3",
+  "files": [
+    ".json",
+    ".png"
+  ],
+  "subMetas": {
+    "6c48a": {
+      "importer": "texture",
+      "uuid": "3a25bdbd-a9f1-4b12-975a-d3103049e5d3@6c48a",
+      "displayName": "ChatGPT Image Apr 27, 2026, 11_39_00 AM",
+      "id": "6c48a",
+      "name": "texture",
+      "userData": {
+        "wrapModeS": "mirrored-repeat",
+        "wrapModeT": "mirrored-repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "linear",
+        "anisotropy": 0,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "3a25bdbd-a9f1-4b12-975a-d3103049e5d3",
+        "visible": false
+      },
+      "ver": "1.0.22",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "type": "texture",
+    "fixAlphaTransparencyArtifacts": false,
+    "hasAlpha": false,
+    "redirect": "3a25bdbd-a9f1-4b12-975a-d3103049e5d3@6c48a"
+  }
+}

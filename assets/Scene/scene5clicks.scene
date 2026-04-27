@@ -1,7 +1,7 @@
 [
   {
     "__type__": "cc.SceneAsset",
-    "_name": "scene",
+    "_name": "scene5clicks",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_native": "",
@@ -11,7 +11,7 @@
   },
   {
     "__type__": "cc.Scene",
-    "_name": "scene",
+    "_name": "scene5clicks",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": null,
@@ -86,7 +86,7 @@
     "_globals": {
       "__id__": 11231
     },
-    "_id": "c82bb5ee-fc0d-4b2e-be66-3eecc925d5a0"
+    "_id": "80546990-8c4b-48b7-a63c-1c9c802345d3"
   },
   {
     "__type__": "cc.Node",
@@ -378,23 +378,23 @@
     "levelColors": [
       {
         "__type__": "cc.Color",
-        "r": 167,
-        "g": 196,
-        "b": 230,
+        "r": 174,
+        "g": 202,
+        "b": 235,
         "a": 255
       },
       {
         "__type__": "cc.Color",
-        "r": 147,
+        "r": 146,
         "g": 212,
         "b": 207,
         "a": 255
       },
       {
         "__type__": "cc.Color",
-        "r": 195,
-        "g": 164,
-        "b": 235,
+        "r": 203,
+        "g": 173,
+        "b": 225,
         "a": 255
       }
     ],
@@ -405,7 +405,7 @@
       "__id__": 67
     },
     "lastLevelCtaAfterSnakes": 4,
-    "clicksToRedirect": -1,
+    "clicksToRedirect": 5,
     "_id": "ce49MsyP9LR4rgUZtVvQh+"
   },
   {
@@ -4578,7 +4578,7 @@
       "y": 89.99999999999999,
       "z": 0
     },
-    "_id": "84W7dZxT5J67h6pm4DSOet"
+    "_id": "b1SnlO8chBpLxwonln1U71"
   },
   {
     "__type__": "cc.MeshRenderer",
@@ -4613,7 +4613,7 @@
     "_reflectionProbeBlendWeight": 0,
     "_enabledGlobalStandardSkinObject": false,
     "_enableMorph": true,
-    "_id": "a7S4WpltNNyqnri5CAo4wq"
+    "_id": "e2ybp30TlFuo0yht2CLb1i"
   },
   {
     "__type__": "cc.ModelBakeSettings",
@@ -4678,7 +4678,7 @@
       "y": 89.99999999999999,
       "z": 0
     },
-    "_id": "4eqSj7/fZFNrX56h69FC73"
+    "_id": "4cGb9V8iFO87l0RKfWn7ft"
   },
   {
     "__type__": "cc.MeshRenderer",
@@ -4713,7 +4713,7 @@
     "_reflectionProbeBlendWeight": 0,
     "_enabledGlobalStandardSkinObject": false,
     "_enableMorph": true,
-    "_id": "1659PqZu1LO7wBfDEVl4NS"
+    "_id": "9dGndxVw1JNZl+fTxlVmgr"
   },
   {
     "__type__": "cc.ModelBakeSettings",
@@ -4778,7 +4778,7 @@
       "y": 89.99999999999999,
       "z": 0
     },
-    "_id": "68Glbm71FEWoPk5a4pEq0C"
+    "_id": "c7IEQrZQdPVp4zigx1FbgX"
   },
   {
     "__type__": "cc.MeshRenderer",
@@ -4813,7 +4813,7 @@
     "_reflectionProbeBlendWeight": 0,
     "_enabledGlobalStandardSkinObject": false,
     "_enableMorph": true,
-    "_id": "642tSNCUZGm7YzoKQYMzew"
+    "_id": "0ao6fPq0RB57A25em3hEaR"
   },
   {
     "__type__": "cc.ModelBakeSettings",
@@ -4878,7 +4878,7 @@
       "y": 89.99999999999999,
       "z": 0
     },
-    "_id": "82iRRnkdxE75h3P3VjtKPu"
+    "_id": "ddIiRqvK9PHo/2SsDV1RAA"
   },
   {
     "__type__": "cc.MeshRenderer",
@@ -4913,7 +4913,7 @@
     "_reflectionProbeBlendWeight": 0,
     "_enabledGlobalStandardSkinObject": false,
     "_enableMorph": true,
-    "_id": "7fizLm4shMjbvRJmW0dv2q"
+    "_id": "8duIH0dZlDTI9LGYL8ZxPj"
   },
   {
     "__type__": "cc.ModelBakeSettings",
@@ -4978,7 +4978,7 @@
       "y": 89.99999999999999,
       "z": 0
     },
-    "_id": "bcDoJq9N5G+q8VRU7cDUMz"
+    "_id": "afty7+MIJHxq/dyNmeg252"
   },
   {
     "__type__": "cc.MeshRenderer",
@@ -5013,7 +5013,7 @@
     "_reflectionProbeBlendWeight": 0,
     "_enabledGlobalStandardSkinObject": false,
     "_enableMorph": true,
-    "_id": "8eXho7OyJJxryflwp4N0+T"
+    "_id": "97pVKKw+1BMY6v8Rno9viZ"
   },
   {
     "__type__": "cc.ModelBakeSettings",
@@ -5078,7 +5078,7 @@
       "y": 89.99999999999999,
       "z": 0
     },
-    "_id": "81fRxLY69I57P+rii3H5uO"
+    "_id": "252FFL/N5GyonpS4MbkXtN"
   },
   {
     "__type__": "cc.MeshRenderer",
@@ -5113,7 +5113,7 @@
     "_reflectionProbeBlendWeight": 0,
     "_enabledGlobalStandardSkinObject": false,
     "_enableMorph": true,
-    "_id": "66a1J7oVZL8YQvm0v571br"
+    "_id": "10A94JfnVNGJyzBOYuMfJv"
   },
   {
     "__type__": "cc.ModelBakeSettings",
@@ -103055,7 +103055,7 @@
       "y": 89.99999999999999,
       "z": 0
     },
-    "_id": "18SZd1FpRIrpOkXci0oOTW"
+    "_id": "bej7JqkcVP852MX/thrWEQ"
   },
   {
     "__type__": "cc.MeshRenderer",
@@ -103090,7 +103090,7 @@
     "_reflectionProbeBlendWeight": 0,
     "_enabledGlobalStandardSkinObject": false,
     "_enableMorph": true,
-    "_id": "f6sSiA8ChJCoSp396Eb/le"
+    "_id": "40dFB9SrRJaZCGTHjYWMQt"
   },
   {
     "__type__": "cc.ModelBakeSettings",
@@ -103155,7 +103155,7 @@
       "y": 89.99999999999999,
       "z": 0
     },
-    "_id": "74oeHWCy5Ib5+Z3bkef7lQ"
+    "_id": "b414EGxXBEMby+J4dYsABr"
   },
   {
     "__type__": "cc.MeshRenderer",
@@ -103190,7 +103190,7 @@
     "_reflectionProbeBlendWeight": 0,
     "_enabledGlobalStandardSkinObject": false,
     "_enableMorph": true,
-    "_id": "b1O2ZHmoVKBL250E0kgsHR"
+    "_id": "09yJBlqjhBD41t5DP208mp"
   },
   {
     "__type__": "cc.ModelBakeSettings",
@@ -103255,7 +103255,7 @@
       "y": 89.99999999999999,
       "z": 0
     },
-    "_id": "d14DVIOFJLnahU1xwe1Dve"
+    "_id": "05SUmCVkpEg7eG/q1HluGp"
   },
   {
     "__type__": "cc.MeshRenderer",
@@ -103290,7 +103290,7 @@
     "_reflectionProbeBlendWeight": 0,
     "_enabledGlobalStandardSkinObject": false,
     "_enableMorph": true,
-    "_id": "43GsIVmk5B4ocZHAGlAJvx"
+    "_id": "59q6fLfS5AbaiNXzt76+pk"
   },
   {
     "__type__": "cc.ModelBakeSettings",
@@ -103355,7 +103355,7 @@
       "y": 89.99999999999999,
       "z": 0
     },
-    "_id": "11EWr+eWNG5ZKMBXyT/8Se"
+    "_id": "baw5ksY/FMQ6G2KBpd9CW/"
   },
   {
     "__type__": "cc.MeshRenderer",
@@ -103390,7 +103390,7 @@
     "_reflectionProbeBlendWeight": 0,
     "_enabledGlobalStandardSkinObject": false,
     "_enableMorph": true,
-    "_id": "feeRmlX9RJo4L9ublLGg99"
+    "_id": "afRFe9VjBM8LAXGVcTrMpB"
   },
   {
     "__type__": "cc.ModelBakeSettings",
@@ -103455,7 +103455,7 @@
       "y": 89.99999999999999,
       "z": 0
     },
-    "_id": "58Kuh5hmZF95Yrrp9CLQJK"
+    "_id": "ebEUVFuyBA7Jx8dqHSIFvR"
   },
   {
     "__type__": "cc.MeshRenderer",
@@ -103490,7 +103490,7 @@
     "_reflectionProbeBlendWeight": 0,
     "_enabledGlobalStandardSkinObject": false,
     "_enableMorph": true,
-    "_id": "6fvaVN5t5H1rfYdkK0XB/a"
+    "_id": "bd0bbZ0xJLhJc/q822YQZi"
   },
   {
     "__type__": "cc.ModelBakeSettings",
@@ -103555,7 +103555,7 @@
       "y": 89.99999999999999,
       "z": 0
     },
-    "_id": "d5Iv6DJexLI6ULzrvK2Wta"
+    "_id": "68ZgerGupBeYKtYZClTZq4"
   },
   {
     "__type__": "cc.MeshRenderer",
@@ -103590,7 +103590,7 @@
     "_reflectionProbeBlendWeight": 0,
     "_enabledGlobalStandardSkinObject": false,
     "_enableMorph": true,
-    "_id": "df5nXkJ8xO/q/f6Rh3Tri5"
+    "_id": "d8AKWTJAVIVbQU1alkyjs/"
   },
   {
     "__type__": "cc.ModelBakeSettings",
