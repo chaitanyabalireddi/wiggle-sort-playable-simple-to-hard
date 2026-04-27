@@ -47,8 +47,7 @@ export class Snake extends Component {
 	directionTarget: Node = null;
 
 	@property({
-		tooltip:
-			"Minimum world-unit gap to detect collision with another snake",
+		tooltip: "Minimum world-unit gap to detect collision with another snake",
 	})
 	collisionRadius: number = 0.6;
 
@@ -230,8 +229,8 @@ export class Snake extends Component {
 		const ray = cam.screenPointToRay(sx, sy);
 		if (PhysicsSystem.instance.raycastClosest(ray)) {
 			if (
-				PhysicsSystem.instance.raycastClosestResult.collider.node
-					.parent === this.node
+				PhysicsSystem.instance.raycastClosestResult.collider.node.parent ===
+				this.node
 			)
 				this.onSnakeClicked();
 			return;
@@ -333,8 +332,7 @@ export class Snake extends Component {
 			// Auto-detect segments from children with "Segment" in name, in hierarchy order
 			const segmentNodes = this.node.children.filter(
 				(c) =>
-					c !== this.headNode &&
-					c.name.toLowerCase().includes("segment"),
+					c !== this.headNode && c.name.toLowerCase().includes("segment"),
 			);
 
 			if (segmentNodes.length > 0) {
@@ -405,8 +403,7 @@ export class Snake extends Component {
 		const poseDist: number[] = [0];
 		for (let i = 1; i < posePoints.length; i++) {
 			poseDist.push(
-				poseDist[i - 1] +
-					Vec3.distance(posePoints[i - 1], posePoints[i]),
+				poseDist[i - 1] + Vec3.distance(posePoints[i - 1], posePoints[i]),
 			);
 		}
 		const totalPoseLen = poseDist[poseDist.length - 1] || 1;
@@ -463,12 +460,7 @@ export class Snake extends Component {
 					d1 = this.headDistHist[idx];
 				const t = d1 - d0 > 0.0001 ? (targetDist - d0) / (d1 - d0) : 0;
 				const out = new Vec3();
-				Vec3.lerp(
-					out,
-					this.headHistory[prev],
-					this.headHistory[idx],
-					t,
-				);
+				Vec3.lerp(out, this.headHistory[prev], this.headHistory[idx], t);
 				return out;
 			}
 			idx = prev;
@@ -508,9 +500,7 @@ export class Snake extends Component {
 
 		// Debounce check - but reduce the debounce time for better responsiveness
 		if (now - this.lastClickTime < this.CLICK_DEBOUNCE_MS) {
-			console.log(
-				`[Snake Click] ${this.snakeColor} - Rejected: debounce`,
-			);
+			console.log(`[Snake Click] ${this.snakeColor} - Rejected: debounce`);
 			return;
 		}
 
@@ -619,9 +609,7 @@ export class Snake extends Component {
 		this._originRotations = [];
 		if (this.headNode) {
 			this._originPose.push(this.headNode.getWorldPosition().clone());
-			this._originRotations.push(
-				this.headNode.getWorldRotation().clone(),
-			);
+			this._originRotations.push(this.headNode.getWorldRotation().clone());
 		}
 		for (const seg of this.bodySegments) {
 			if (seg) {
@@ -654,8 +642,7 @@ export class Snake extends Component {
 			this._shakeTimer += deltaTime;
 			if (this._shakeTimer >= this._shakeDuration) {
 				for (const entry of this._shakeOriginPositions) {
-					if (entry.node?.isValid)
-						entry.node.setWorldPosition(entry.pos);
+					if (entry.node?.isValid) entry.node.setWorldPosition(entry.pos);
 				}
 				this._isShaking = false;
 				this._shakeOriginPositions = [];
@@ -690,9 +677,8 @@ export class Snake extends Component {
 			const step = this.moveSpeed * deltaTime;
 			this.node.getChildByName("Head").getChildByName("Eyelid").active =
 				false;
-			this.node
-				.getChildByName("Head")
-				.getChildByName("Eyelid-001").active = false;
+			this.node.getChildByName("Head").getChildByName("Eyelid-001").active =
+				false;
 			// Get current head position
 			const headCurrentPos = this.headNode.getWorldPosition();
 			const toHole = new Vec3();
@@ -809,10 +795,7 @@ export class Snake extends Component {
 			for (const seg of this.bodySegments) if (seg) nodes.push(seg);
 
 			for (let i = 0; i < nodes.length; i++) {
-				if (
-					i < this._bouncePose.length &&
-					i < this._originPose.length
-				) {
+				if (i < this._bouncePose.length && i < this._originPose.length) {
 					const p = new Vec3();
 					Vec3.lerp(p, this._bouncePose[i], this._originPose[i], t);
 					nodes[i].setWorldPosition(p);
@@ -968,8 +951,7 @@ export class Snake extends Component {
 					Math.min(step, distToPath),
 				);
 
-				const hitIdleSnake =
-					this.checkCollisionWithOthers(candidatePos);
+				const hitIdleSnake = this.checkCollisionWithOthers(candidatePos);
 				if (hitIdleSnake && !hitIdleSnake._isMoving) {
 					// Hit an idle snake — bounce back to original position
 					this._isMoving = false;
@@ -1004,8 +986,7 @@ export class Snake extends Component {
 					this._pathTraveled += step;
 					if (pathLen > 0) {
 						this._pathDistance =
-							((this._pathDistance % pathLen) + pathLen) %
-							pathLen;
+							((this._pathDistance % pathLen) + pathLen) % pathLen;
 					}
 					newHeadPos = this.snakePath.getPointAtDistance(
 						this._pathDistance,
@@ -1129,9 +1110,7 @@ export class Snake extends Component {
 
 			// Find closest point on path to this node
 			const closestDist = this.snakePath.getClosestDistance(nodePos);
-			const distFromEntry = Math.abs(
-				closestDist - this._pathEntryDistance,
-			);
+			const distFromEntry = Math.abs(closestDist - this._pathEntryDistance);
 			const minPathDist =
 				pathLen > 0
 					? Math.min(distFromEntry, pathLen - distFromEntry)
@@ -1446,11 +1425,7 @@ export class Snake extends Component {
 	}
 	private _hasAppliedHoleSpeedBoost: boolean = false;
 
-	public seekHole(
-		holeNode: Node,
-		holeWorldPos: Vec3,
-		onComplete?: () => void,
-	) {
+	public seekHole(holeNode: Node, holeWorldPos: Vec3, onComplete?: () => void) {
 		if (this._isEnteringHole || this._done || this._seekingHole) return;
 		if (!this._isMoving) return;
 
@@ -1467,7 +1442,7 @@ export class Snake extends Component {
 
 		if (!this._hasAppliedHoleSpeedBoost) {
 			this._hasAppliedHoleSpeedBoost = true;
-			this.moveSpeed *= 3;
+			this.moveSpeed *= 2;
 		}
 	}
 
@@ -1491,10 +1466,7 @@ export class Snake extends Component {
 			if (hole?.advanceColor) {
 				hole.advanceColor();
 			}
-			if (
-				hole &&
-				(!hole.colorMappings || hole.colorMappings.length < 2)
-			) {
+			if (hole && (!hole.colorMappings || hole.colorMappings.length < 2)) {
 				const remaining = this.node.scene
 					.getComponentsInChildren(Snake)
 					.filter(
