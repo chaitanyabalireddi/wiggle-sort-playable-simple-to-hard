@@ -992,9 +992,9 @@ export class Snake extends Component {
 						this._pathDistance,
 					);
 
-					if (this._pathTraveled >= pathLen * 0.33) {
-						this._checkForNearbyHole(newHeadPos);
-					}
+					// if (this._pathTraveled >= pathLen * 0.33) {
+					this._checkForNearbyHole(newHeadPos);
+					// }
 				}
 			}
 		} else {
@@ -1442,7 +1442,7 @@ export class Snake extends Component {
 
 		if (!this._hasAppliedHoleSpeedBoost) {
 			this._hasAppliedHoleSpeedBoost = true;
-			this.moveSpeed *= 2;
+			this.moveSpeed *= this.bodySegments.length > 12 ? 3 : 2;
 		}
 	}
 

@@ -21,7 +21,7 @@
             "_value": true
           },
           "skeletal-animation": {
-            "_value": false
+            "_value": true
           },
           "3d": {
             "_value": true
@@ -79,7 +79,7 @@
             "_value": false
           },
           "physics-2d": {
-            "_value": false,
+            "_value": true,
             "_option": "physics-2d-box2d"
           },
           "physics-2d-box2d": {
@@ -122,34 +122,34 @@
             "_value": true
           },
           "video": {
-            "_value": false
+            "_value": true
           },
           "webview": {
-            "_value": false
+            "_value": true
           },
           "tween": {
             "_value": true
           },
           "websocket": {
-            "_value": false
+            "_value": true
           },
           "websocket-server": {
             "_value": false
           },
           "terrain": {
-            "_value": false
+            "_value": true
           },
           "light-probe": {
-            "_value": false
+            "_value": true
           },
           "tiled-map": {
-            "_value": false
+            "_value": true
           },
           "vendor-google": {
             "_value": false
           },
           "spine": {
-            "_value": false,
+            "_value": true,
             "_option": "spine-3.8"
           },
           "spine-3.8": {
@@ -165,10 +165,10 @@
             }
           },
           "dragon-bones": {
-            "_value": false
+            "_value": true
           },
           "marionette": {
-            "_value": false
+            "_value": true
           },
           "procedural-animation": {
             "_value": false
@@ -191,6 +191,7 @@
           }
         },
         "flags": {
+          "LOAD_SPINE_MANUALLY": false,
           "LOAD_BULLET_MANUALLY": false
         },
         "includeModules": [
@@ -201,20 +202,31 @@
           "audio",
           "base",
           "custom-pipeline",
+          "dragon-bones",
           "gfx-webgl",
           "gfx-webgl2",
           "graphics",
           "intersection-2d",
+          "light-probe",
+          "marionette",
           "mask",
           "particle",
           "particle-2d",
+          "physics-2d-box2d",
           "physics-ammo",
           "primitive",
           "profiler",
           "rich-text",
+          "skeletal-animation",
+          "spine-3.8",
+          "terrain",
+          "tiled-map",
           "tween",
           "ui",
-          "ui-skew"
+          "ui-skew",
+          "video",
+          "websocket",
+          "webview"
         ],
         "noDeprecatedFeatures": {
           "value": false,
