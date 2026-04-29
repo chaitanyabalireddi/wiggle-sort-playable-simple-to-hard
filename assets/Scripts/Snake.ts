@@ -350,26 +350,25 @@ export class Snake extends Component {
 		}
 	}
 
-	// ── Compute head facing direction from its current rotation ──────────────
 	private computeHeadDirection() {
 		if (!this.headNode) return;
 
-		const headPos = this.headNode.getWorldPosition();
+		const headPos = this.headNode.getWorldPosition().clone();
 
 		if (this.directionTarget) {
-			const targetPos = this.directionTarget.getWorldPosition();
+			const targetPos = this.directionTarget.getWorldPosition().clone();
 			const dir = new Vec3();
 			Vec3.subtract(dir, targetPos, headPos);
-			dir.y = 0;
+			dir.y = 0; // flatten to XZ plane
 			if (dir.lengthSqr() > 0.0001) {
-				Vec3.normalize(dir, dir);
+				Vec3.normalize(dir, dir); // must be a unit vector
 				this._moveDir.set(dir);
 				this.lastTravelDir.set(dir);
 				return;
 			}
 		}
 
-		const rot = this.headNode.getWorldRotation();
+		const rot = this.headNode.getWorldRotation().clone();
 		const fwd = new Vec3(0, 0, 1);
 		Vec3.transformQuat(fwd, fwd, rot);
 		fwd.y = 0;
@@ -1414,7 +1413,7 @@ export class Snake extends Component {
 				// Only boost speed the very first time, never again
 				if (!this._hasAppliedHoleSpeedBoost) {
 					this._hasAppliedHoleSpeedBoost = true;
-					this.moveSpeed *= this.bodySegments.length > 12 ? 3 : 2;
+					this.moveSpeed *= this.bodySegments.length > 12 ? 2.5 : 2;
 				}
 
 				console.log(
