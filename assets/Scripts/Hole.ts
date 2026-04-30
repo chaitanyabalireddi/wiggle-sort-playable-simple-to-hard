@@ -60,8 +60,7 @@ export class Hole extends Component {
 
 	@property({
 		type: Prefab,
-		tooltip:
-			"Particle effect prefab to spawn when a snake enters this hole",
+		tooltip: "Particle effect prefab to spawn when a snake enters this hole",
 	})
 	entryParticlePrefab: Prefab = null;
 
@@ -115,9 +114,7 @@ export class Hole extends Component {
 			const colors: string[] = [];
 			const levelRoot = this.findLevelRoot();
 			if (levelRoot) {
-				const allHoles = levelRoot.getComponentsInChildren(
-					"Hole",
-				) as any[];
+				const allHoles = levelRoot.getComponentsInChildren("Hole") as any[];
 				for (const h of allHoles) {
 					if (
 						h.node !== this.node &&
@@ -144,9 +141,8 @@ export class Hole extends Component {
 				let startIndex = 0;
 				for (let i = 0; i < this.colorMappings.length; i++) {
 					const col =
-						this.colorMappings[i]?.colorName
-							?.toLowerCase()
-							.trim() ?? "";
+						this.colorMappings[i]?.colorName?.toLowerCase().trim() ??
+						"";
 					if (otherColors.indexOf(col) === -1) {
 						startIndex = i;
 						break;
@@ -241,15 +237,14 @@ export class Hole extends Component {
 			case "grey":
 			case "gray":
 				return new Color(150, 150, 160, 255);
+			case "lavender":
+				return new Color(253, 85, 255, 255);
 			default:
 				return new Color(40, 40, 40, 255);
 		}
 	}
 
-	private applyColorToRenderer(
-		renderer: MeshRenderer | null,
-		colorName: string,
-	) {
+	private applyColorToRenderer(renderer: MeshRenderer | null, colorName: string) {
 		if (!renderer) return;
 		const color = this.colorNameToColor(colorName);
 		if (renderer.material) {
@@ -309,8 +304,7 @@ export class Hole extends Component {
 		if (levelRoot) {
 			const allHoles = levelRoot.getComponentsInChildren("Hole") as any[];
 			for (const h of allHoles)
-				if (h.node !== this.node && !h.isNextPreview)
-					otherHoles.push(h);
+				if (h.node !== this.node && !h.isNextPreview) otherHoles.push(h);
 		}
 		const otherHoleColors = otherHoles
 			.map((h) => h.getCurrentColorName())
@@ -330,28 +324,23 @@ export class Hole extends Component {
 						.trim() ?? "";
 				if (otherHoleColors.indexOf(proposedColor) !== -1) {
 					// Find any color not used by other holes
-					const availableColors = this.colorMappings.filter(
-						(m, idx) => {
-							const col = m.colorName.toLowerCase().trim();
-							return (
-								col !== currentCol &&
-								otherHoleColors.indexOf(col) === -1
-							);
-						},
-					);
+					const availableColors = this.colorMappings.filter((m, idx) => {
+						const col = m.colorName.toLowerCase().trim();
+						return (
+							col !== currentCol &&
+							otherHoleColors.indexOf(col) === -1
+						);
+					});
 					if (availableColors.length > 0) {
 						// Pick first available color that has an active snake
 						for (const mapping of availableColors) {
 							const col = mapping.colorName.toLowerCase().trim();
 							const hasSnake = active.some(
-								(s) =>
-									s.snakeColor.toLowerCase().trim() === col,
+								(s) => s.snakeColor.toLowerCase().trim() === col,
 							);
 							if (hasSnake) {
 								easiestIdx = this.colorMappings.findIndex(
-									(m) =>
-										m.colorName.toLowerCase().trim() ===
-										col,
+									(m) => m.colorName.toLowerCase().trim() === col,
 								);
 								break;
 							}
@@ -402,9 +391,7 @@ export class Hole extends Component {
 					);
 				});
 				if (differentSnake) {
-					const snakeCol = differentSnake.snakeColor
-						.toLowerCase()
-						.trim();
+					const snakeCol = differentSnake.snakeColor.toLowerCase().trim();
 					const idx = this.colorMappings.findIndex(
 						(m) => m.colorName.toLowerCase().trim() === snakeCol,
 					);
@@ -466,22 +453,17 @@ export class Hole extends Component {
 							otherHoles.push(h);
 				}
 
-				const otherColors = otherHoles.map((h) =>
-					h.getCurrentColorName(),
-				);
+				const otherColors = otherHoles.map((h) => h.getCurrentColorName());
 
 				// Find the EASIEST snake that's NOT used by other holes
 				const easiestIdx = this.getEasiestSnakeIndex();
 				let bestMatch: Snake | undefined;
 				if (easiestIdx !== -1) {
-					const easiestColor = this.colorMappings[
-						easiestIdx
-					]?.colorName
+					const easiestColor = this.colorMappings[easiestIdx]?.colorName
 						?.toLowerCase()
 						.trim();
 					bestMatch = active.find(
-						(s) =>
-							s.snakeColor.toLowerCase().trim() === easiestColor,
+						(s) => s.snakeColor.toLowerCase().trim() === easiestColor,
 					);
 				}
 				// If no easiest match found or it's used by other holes, try to find any unused
@@ -534,8 +516,7 @@ export class Hole extends Component {
 						.trim();
 					nextMatch = active.find(
 						(s) =>
-							s.snakeColor.toLowerCase().trim() ===
-							nextEasiestColor,
+							s.snakeColor.toLowerCase().trim() === nextEasiestColor,
 					);
 				}
 				if (!nextMatch)
@@ -546,9 +527,7 @@ export class Hole extends Component {
 					);
 
 				if (nextMatch) {
-					this._nextColorName = nextMatch.snakeColor
-						.toLowerCase()
-						.trim();
+					this._nextColorName = nextMatch.snakeColor.toLowerCase().trim();
 					this.applyColorToRenderer(
 						this.nextIndicatorRenderer,
 						this._nextColorName,
@@ -578,8 +557,7 @@ export class Hole extends Component {
 		if (levelRoot) {
 			const allHoles = levelRoot.getComponentsInChildren("Hole") as any[];
 			for (const h of allHoles) {
-				if (h.node !== this.node && !h.isNextPreview)
-					otherHoles.push(h);
+				if (h.node !== this.node && !h.isNextPreview) otherHoles.push(h);
 			}
 		}
 
@@ -661,10 +639,7 @@ export class Hole extends Component {
 				);
 				if (mappingIdx === -1) continue;
 
-				const dist = Vec3.distance(
-					headNode.getWorldPosition(),
-					holePos,
-				);
+				const dist = Vec3.distance(headNode.getWorldPosition(), holePos);
 				let easeScore = dist;
 				if (snake.isFrontBlocked()) easeScore += 100;
 				if (snake.isMovingNow()) easeScore -= 20;
@@ -706,8 +681,7 @@ export class Hole extends Component {
 		if (levelRoot) {
 			const allHoles = levelRoot.getComponentsInChildren("Hole") as any[];
 			for (const h of allHoles) {
-				if (h.node !== this.node && !h.isNextPreview)
-					otherHoles.push(h);
+				if (h.node !== this.node && !h.isNextPreview) otherHoles.push(h);
 			}
 		}
 
@@ -1070,11 +1044,7 @@ export class Hole extends Component {
 					this.scheduleOnce(() => {
 						if (fx?.isValid) {
 							tween(fx)
-								.to(
-									0.1,
-									{ scale: Vec3.ZERO },
-									{ easing: "sineIn" },
-								)
+								.to(0.1, { scale: Vec3.ZERO }, { easing: "sineIn" })
 								.call(() => {
 									fx.destroy();
 								})
