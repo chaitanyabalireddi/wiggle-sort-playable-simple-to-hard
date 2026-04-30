@@ -342,7 +342,7 @@
     "tutorialHand": {
       "__id__": 87
     },
-    "gameTimerDuration": 90,
+    "gameTimerDuration": 60,
     "tutorialIdleDuration": 6,
     "sfxAudioSource": {
       "__id__": 95
@@ -404,8 +404,8 @@
     "confettiManager": {
       "__id__": 67
     },
-    "lastLevelCtaAfterSnakes": 6,
-    "clicksToRedirect": -1,
+    "lastLevelCtaAfterSnakes": 3,
+    "clicksToRedirect": 5,
     "_id": "ce49MsyP9LR4rgUZtVvQh+"
   },
   {
